@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 4.1.2)
 # Since this is the top level CMakeLists.txt, the project name is also accessible
 # with ${CMAKE_PROJECT_NAME} (both CMake variables are in-sync within the top level
 # build script scope).
-project("cspice")
+project("cspice" LANGUAGES C CXX)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -67,6 +67,8 @@ add_library(${CMAKE_PROJECT_NAME}
 #                      ${tootassimp_bd}/${ANDROID_ABI}/libtootassimp.so )
 # include_directories(${tootassimp_src}/include)
 
+
+if(ANDROID)
 target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
         "-Wl,--no-gc-sections")
 
@@ -76,5 +78,38 @@ target_link_libraries(
         # List libraries link to the target library
         android
         log)
+
+
+elseif(APPLE)
+
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+ #   FRAMEWORK TRUE
+    FRAMEWORK_VERSION "1.0.1"
+    MACOSX_FRAMEWORK_IDENTIFIER com.tootzoe.libcspice
+ #   PUBLIC_HEADER "cspice/aa.h cspice/bb.h"
+    XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
+    XCODE_ATTRIBUTE_BUILD_LIBRARY_FOR_DISTRIBUTION "YES"
+)
+
+
+
+target_link_libraries(
+        ${CMAKE_PROJECT_NAME}
+ #       tootassimp
+        # List libraries link to the target library
+        )
+
+endif()
+
+
+## toot generate .xcodeproj
+#  cmake -S . -B tootbd_iOS -G Xcode -DCMAKE_SYSTEM_NAME=iOS
+#  cmake -S . -B tootbd_Mac -G Xcode -DCMAKE_SYSTEM_NAME=Darwin
+
+# on Mac , if 'No CMAKE_C_COMPILER could be found.'
+
+# cmake -D CMAKE_C_COMPILER="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc" -D CMAKE_CXX_COMPILER="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++"  -S . -B tootbd_Mac -G Xcode -DCMAKE_SYSTEM_NAME=Darwin
+
+
 
 
